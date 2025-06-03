@@ -1,8 +1,3 @@
----
-hide: true
-nav_order: 1
----
-
 # Текущая архитектура
 
 ## Краткое описание
@@ -46,6 +41,5 @@ Rel(monolith, database, "Чтение/запись данных", "SQL")
 Rel(monolith, sensor, "Опрос температуры", "HTTP поллинг")
 Rel_Back(sensor, monolith, "Данные о температуре", "HTTP Push")
 
-SHOW_LEGEND()
 @enduml
 ```
