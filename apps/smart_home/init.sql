@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS sensors (
     last_updated TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+ALTER TABLE sensors ALTER COLUMN value SET DEFAULT 0.0;
+UPDATE sensors SET value = 0.0 WHERE value IS NULL;
 
 INSERT INTO sensors (name, location, type, value, unit, status, last_updated)
 VALUES
