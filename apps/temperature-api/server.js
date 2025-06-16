@@ -27,8 +27,8 @@ function getSensorMapping(location, sensorId) {
 app.get('/temperature', (req, res) => {
     let { location, sensorId } = req.query;
     ({ sensorId, location } = getSensorMapping(location, sensorId));
-    const temperature = +(Math.random() * (30-16) + 16).toFixed(2);
-    res.json({ sensorId, location, temperature });
+    const value = +(Math.random() * (30-16) + 16).toFixed(2);
+    res.json({ sensorId, location, value });
 });
 
 // /temperature/:sensorId
