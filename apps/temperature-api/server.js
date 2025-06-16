@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 
 function getSensorMapping(location, sensorId) {
-    // определяем location по sensorId
+// If no location is provided, use a default based on sensor ID
     if (!location) {
         switch (sensorId) {
             case "1": location = "Living Room"; break;
@@ -11,7 +11,7 @@ function getSensorMapping(location, sensorId) {
             default:  location = "Unknown";
         }
     }
-    // определяем sensorId по location
+// If no sensor ID is provided, generate one based on location
     if (!sensorId) {
         switch (location) {
             case "Living Room": sensorId = "1"; break;
