@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -27,7 +29,7 @@ services:
     networks:
       - smarthome-network
 
-  app:
+  smarthome-app:
     build:
       context: ./smart_home
       dockerfile: Dockerfile
