@@ -1,0 +1,5 @@
+site_name: WarmHouse
+
+plugins:
+  - plantuml:
+      puml_url: https://www.plantuml.com/plantuml/

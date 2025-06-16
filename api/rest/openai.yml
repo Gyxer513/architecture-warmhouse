@@ -1,0 +1,230 @@
+openapi: 3.0.3
+info:
+  title: IoT Ecosystem API
+  version: '1.0.0'
+  description: API спецификация для микросервисной IoT-архитектуры (Device, Control, Telemetry).
+
+servers:
+  - url: https://api.example.com
+
+paths:
+  /devices:
+    get:
+      summary: Получить список устройств
+      tags: [Device]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceShort'
+              example:
+                - id: "dev001"
+                  name: "Thermostat #1"
+                  status: "online"
+                  type: "thermostat"
+                  location: "room 101"
+                - id: "dev002"
+                  name: "Heater #1"
+                  status: "offline"
+                  type: "heater"
+                  location: "room 101"
+        '401':
+          description: Unauthorized
+
+  /devices/{deviceId}:
+    get:
+      summary: Получить информацию об устройстве
+      tags: [Device]
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+              example:
+                id: "dev001"
+                name: "Thermostat #1"
+                status: "online"
+                type: "thermostat"
+                config:
+                  min_temp: 19
+                  max_temp: 23
+        '404':
+          description: Device not found
+
+  /devices/{deviceId}/status:
+    patch:
+      summary: Обновить статус устройства
+      tags: [Device]
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [online, offline, maintenance]
+            example:
+              status: "online"
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  status:
+                    type: string
+              example:
+                id: "dev001"
+                status: "online"
+        '404':
+          description: Device not found
+
+  /devices/{deviceId}/commands:
+    post:
+      summary: Отправить команду устройству
+      tags: [Control]
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                command:
+                  type: string
+                parameters:
+                  type: object
+            example:
+              command: "turn_on"
+              parameters:
+                duration: 3600
+      responses:
+        '202':
+          description: Команда принята (будет обработана асинхронно)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  command_id:
+                    type: string
+                  device_id:
+                    type: string
+              example:
+                status: "accepted"
+                command_id: "cmd-789234"
+                device_id: "dev001"
+        '400':
+          description: Invalid command
+        '404':
+          description: Device not found
+
+  /devices/{deviceId}/telemetry:
+    get:
+      summary: Получить телеметрию устройства
+      tags: [Telemetry]
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  telemetry:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TelemetryRecord'
+              example:
+                telemetry:
+                  - timestamp: "2024-06-21T12:00:00Z"
+                    temperature: 22.2
+                    humidity: 45
+                  - timestamp: "2024-06-21T13:00:00Z"
+                    temperature: 22.4
+                    humidity: 44
+        '404':
+          description: Device not found
+
+components:
+  schemas:
+    DeviceShort:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        type:
+          type: string
+        location:
+          type: string
+    Device:
+      allOf:
+        - $ref: '#/components/schemas/DeviceShort'
+        - type: object
+          properties:
+            config:
+              type: object
+    TelemetryRecord:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        temperature:
+          type: number
+        humidity:
+          type: number
